@@ -19,7 +19,7 @@ document.getElementsByClassName('btn')[0].addEventListener('click',(e)=>{
     console.log(objBody)
     e.preventDefault();
    
-    axios.post("http://localhost:3000/user",objBody).then(result=>{
+    axios.post("http://localhost:3000/user/signUp",objBody).then(result=>{
         console.log(result);
         alert(result.data.message)
     }).catch(err=>{

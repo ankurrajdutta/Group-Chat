@@ -10,7 +10,8 @@ document.getElementsByClassName('btn')[0].addEventListener('click',(e)=>{
     axios.post('http://localhost:3000/user/login',objBody).then(result=>{
         console.log(result);
         alert(result.data.message);
-        localStorage.setItem('token',result.data.token)
+        localStorage.setItem('token',result.data.token);
+        window.location.href='../chatPage/chatPage.html'
     }).catch(err=>{
         console.log(err)
     })

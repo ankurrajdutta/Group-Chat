@@ -1,0 +1,26 @@
+.centered{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 600px;
+   
+}
+#chatHeader{
+    text-align: center;
+}
+#chatFooter{
+    background-color: aqua;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+} 
+p:nth-child(odd){
+    background-color: orange;
+}
+p:nth-child(even){
+    background-color: lightgreen;
+}

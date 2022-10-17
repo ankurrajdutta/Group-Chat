@@ -1,4 +1,5 @@
 const user=require('../model/user');
+const Message=require('../model/message')
 const bcrypt = require("bcrypt");
 var jwt = require("jsonwebtoken");
 const saltRounds = 10;
@@ -37,7 +38,7 @@ exports.addUser=async(req,res,next)=>{
      }).then(result=>{
        bcrypt.compare(userPassword, result.password, function (err, pwdResult) {
          if(pwdResult==true){
-              res.status(200).json({message:"User Logged in successfully",token:generateWebToken(result.id)});
+              res.status(200).json({message:"User Logged in successfully",token:generateWebToken(result.id),result});
          }else
          {
              res.status(401).json({
@@ -48,5 +49,16 @@ exports.addUser=async(req,res,next)=>{
      }).catch(err=>{
          console.log(err);
          res.status(404).json({message:"User Not Found"})
+     })
+ }
+
+ exports.sendMessage=(req,res,next)=>{
+     req.user.createMessage({
+         messageText:req.body.chatMessage
+     }).then(result=>{
+         res.status(200).json({message:"Message added to DB",user:req.user})
+     }).catch(err=>{
+         console.log(err)
+         res.status(404).json({message:"something went wrong"})
      })
  }

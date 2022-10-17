@@ -21,7 +21,8 @@ document.getElementsByClassName('btn')[0].addEventListener('click',(e)=>{
    
     axios.post("http://localhost:3000/user/signUp",objBody).then(result=>{
         console.log(result);
-        alert(result.data.message)
+        alert(result.data.message);
+        window.location.href='../login/login.html'
     }).catch(err=>{
         console.log(err);
         alert(err.response.data.message)

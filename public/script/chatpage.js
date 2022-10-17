@@ -16,18 +16,21 @@ document.getElementsByClassName('btn')[0].addEventListener('click',()=>{
     axios.post("http://localhost:3000/user/sendMessage",reqObj,{headers:{
         Authorization:token
     } }).then(result=>{
-        console.log(result)
+        console.log(result);
+        window.location.reload()
     }).catch(err=>{
         console.log(err)
     });
 })
 
-window.addEventListener("DOMContentLoaded",()=>{
+
+
+setInterval(()=>{
     axios.get("http://localhost:3000/user/getAllMessage").then(response=>{
         let message=response.data.result;
-        
+        chatMessage.innerHTML='';
         message.forEach(element => {
-            console.log(element)
+           
             if(element.messageText=='JOINED'){
             joinedNotificationinUI(element.name)
             }
@@ -37,6 +40,6 @@ window.addEventListener("DOMContentLoaded",()=>{
     }).catch(err=>{
         console.log(err)
     });
-});
+},1000);
 
 

@@ -1,5 +1,6 @@
 const user=require('../model/user');
 const bcrypt = require("bcrypt");
+var jwt = require("jsonwebtoken");
 const saltRounds = 10;
 
 exports.addUser=async(req,res,next)=>{
@@ -17,7 +18,35 @@ exports.addUser=async(req,res,next)=>{
             res.status(200).json({message:"USER CREATED"})
         }).catch(err=>{
             console.log(err);
-            res.status(400).json({message:"USER ALREADY EXISTS"})   
+            res.status(404).json({message:"USER ALREADY EXISTS"})   
         });
 
+ }
+
+ function generateWebToken(id){
+    return jwt.sign({ userId: id }, "shhhhh");
+ }
+
+ exports.login=(req,res,next)=>{
+     const {userEmail,userPassword}=req.body;
+    
+     user.findOne({
+         where:{
+             email:userEmail
+         }
+     }).then(result=>{
+       bcrypt.compare(userPassword, result.password, function (err, pwdResult) {
+         if(pwdResult==true){
+              res.status(200).json({message:"User Logged in successfully",token:generateWebToken(result.id)});
+         }else
+         {
+             res.status(401).json({
+                 message:"Wrong Password"
+             })
+         }
+       });
+     }).catch(err=>{
+         console.log(err);
+         res.status(404).json({message:"User Not Found"})
+     })
  }

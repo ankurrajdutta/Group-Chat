@@ -39,6 +39,10 @@ exports.addUser=async(req,res,next)=>{
        bcrypt.compare(userPassword, result.password, function (err, pwdResult) {
          if(pwdResult==true){
               res.status(200).json({message:"User Logged in successfully",token:generateWebToken(result.id),result});
+              return Message.create({
+                  messageText:"JOINED",
+                  name:result.name
+              })
          }else
          {
              res.status(401).json({
@@ -54,11 +58,20 @@ exports.addUser=async(req,res,next)=>{
 
  exports.sendMessage=(req,res,next)=>{
      req.user.createMessage({
-         messageText:req.body.chatMessage
+         messageText:req.body.chatMessage,
+         name:req.user.name
      }).then(result=>{
          res.status(200).json({message:"Message added to DB",user:req.user})
      }).catch(err=>{
          console.log(err)
          res.status(404).json({message:"something went wrong"})
+     })
+ }
+
+ exports.getAllMessage=(req,res,next)=>{
+     Message.findAll( {attributes: ['messageText', 'name']}).then(result=>{
+         res.status(200).json({message:"Fetched successfully",result})
+     }).catch(err=>{
+         res.status(400).json({message:"Something went wrong"})
      })
  }

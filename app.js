@@ -18,7 +18,7 @@ app.use('/user',userRoutes)
 user.hasMany(message);
 message.belongsTo(user)
 
-sequelize.sync()
+sequelize.sync({force:true})
 .then(()=>{
     app.listen(3000);
 })

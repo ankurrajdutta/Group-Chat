@@ -7,5 +7,6 @@ const authorizationMWare=require('../middleware/authentication')
 router.post("/signUp", userController.addUser);
 router.post('/login',userController.login);
 router.post('/sendMessage',authorizationMWare.authorization,userController.sendMessage)
+router.get('/getAllMessage',userController.getAllMessage)
 
 module.exports = router;

@@ -3,6 +3,7 @@ const Message=require('../model/message')
 const bcrypt = require("bcrypt");
 var jwt = require("jsonwebtoken");
 const saltRounds = 10;
+const { Op } = require("sequelize");
 
 exports.addUser=async(req,res,next)=>{
  
@@ -69,7 +70,15 @@ exports.addUser=async(req,res,next)=>{
  }
 
  exports.getAllMessage=(req,res,next)=>{
-     Message.findAll( {attributes: ['messageText', 'name']}).then(result=>{
+     let lastMessageId = req.query.lastMessageId;
+     Message.findAll({
+         where:{
+             id: {
+                 [Op.gt]:lastMessageId
+             }
+         }
+     }).then(result=>{
+         console.log(lastMessageId)
          res.status(200).json({message:"Fetched successfully",result})
      }).catch(err=>{
          res.status(400).json({message:"Something went wrong"})

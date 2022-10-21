@@ -16,11 +16,47 @@
     justify-content: center;
     position: fixed;
     bottom: 0;
-    width: 100%;
+    right: 0;
+    width: 70%;
 } 
 p:nth-child(odd){
     background-color: orange;
 }
 p:nth-child(even){
     background-color: lightgreen;
+}
+.right{
+    width: 70%;
+    float: right;
+}
+.left{
+    width: 30%;
+    float: left;
+    background-color: aliceblue;
+    height: 100vh;
+   
+}
+.left h1{
+    text-align: center;
+}
+#addGroup{
+    background-color: greenyellow;
+    padding: 5px;
+    border-radius: 5px;
+    color: black;
+}
+#addGroupForm{
+    background-color: skyblue;
+    text-align: center;
+    margin-top: 30px;
+}
+.hidden{
+    display: none;
+}
+#availableGroup div{
+    background-color: violet;
+    display: flex;
+    justify-content: space-around;
+    padding: 5px;
+    margin-bottom: 10px;
 }

@@ -1,29 +1,36 @@
-const express=require('express');
-const app=express();
-const path=require('path');
+const express = require("express");
+const app = express();
+const path = require("path");
 
+const User = require("./model/user");
+const Message = require("./model/message");
+const Group = require("./model/group");
+const User_group= require("./model/user_group");
 
-const user=require('./model/user')
-const message=require('./model/message')
+const userRoutes = require("./routes/user");
+const groupRoutes=require('./routes/group')
 
-const userRoutes=require('./routes/user')
-
-const sequelize=require('./utils/databse')
+const sequelize = require("./utils/databse");
 
 app.use(express.static(path.join(__dirname, "/public")));
 app.use(express.json());
-app.use('/user',userRoutes)
+app.use("/user", userRoutes);
+app.use('/group',groupRoutes)
 
+User.hasMany(Message);
+Message.belongsTo(User);
 
-user.hasMany(message);
-message.belongsTo(user)
+User.belongsToMany(Group, { through: User_group });
+Group.belongsToMany(User, { through: User_group });
 
-sequelize.sync()
-.then(()=>{
+Group.hasMany(Message);
+Message.belongsTo(Group);
+
+sequelize
+  .sync()
+  .then(() => {
     app.listen(3000);
-})
-.catch(err=>{
-    console.log(err)
-})
-
-
+  })
+  .catch((err) => {
+    console.log(err);
+  });

@@ -9,7 +9,7 @@ function showMessageinUI(message,userName){
 }
 function joinedNotificationinUI(userName){
   console.log(chatMessage);
-    chatMessage.innerHTML+=`<p><b>${userName} Joined</b></p>`
+    chatMessage.innerHTML+=`<p><b>${userName} Created this group</b></p>`
 }
 
 
@@ -20,7 +20,7 @@ document.getElementById('addGroup').addEventListener('click',()=>{
 });
 
 document.getElementById("addGroupSubmitButton").addEventListener('click',(e)=>{
-  e.preventDefault();
+
   let token=localStorage.getItem('token')
   let groupName = document.getElementById("inputGroupName").value;
   let reqObj={
@@ -41,12 +41,10 @@ document.getElementById("addGroupSubmitButton").addEventListener('click',(e)=>{
     });
 });
 function viewGroupInUI(obj){
-  availableGroup.innerHTML += `<div><span>${obj.name}</span><button id="addUser" onclick='addUserGroup(event)'>Add User</button> <button onclick='openChat(event)'>Open Chat</button></div>`;
+  availableGroup.innerHTML += `<div><span>${obj.name}</span> <button onclick='openChat(event)'>Open Chat</button></div>`;
 }
-let groupName;
+var groupName;
 function addUserGroup(e){
-  groupName = e.target.parentNode.firstElementChild.innerText;
-  console.log('63',groupName)
   document.getElementById("addUserForm").classList.toggle('hidden');
 }
 
@@ -72,9 +70,37 @@ window.addEventListener('DOMContentLoaded',()=>{
 
 function openChat(e) {
   groupName = e.target.parentNode.firstElementChild.innerText;
-  document.getElementById("chatHeader").innerHTML=`<h1>${groupName}</h1>`;
-  
-  setInterval(()=>{
+  console.log(groupName)
+ if(!document.getElementById('user-list').classList.contains('hidden'))
+ document.getElementById("user-list").classList.add("hidden");
+  let token=localStorage.getItem('token')
+  document.getElementById(
+    "chatHeader"
+  ).innerHTML = `<h1>${groupName}</h1>`
+  axios.get("http://localhost:3000/group/adminChecks", {
+  headers: {
+    Authorization: token,
+  }
+}).then((result)=>{
+  let flag=0;
+  console.log(result.data);
+  result.data.forEach(ele=>{
+    if (ele.name == groupName){
+      if(ele.User_group.isAdmin == true){
+      document.getElementById("buttons-admin").classList.remove("hidden");
+      if(!document.getElementById("buttons-user").classList.contains('hidden'))
+         document.getElementById("buttons-user").classList.add("hidden");
+      }
+      else{
+      document.getElementById("buttons-user").classList.remove("hidden");
+      if(!document.getElementById("buttons-admin").classList.contains('hidden'))
+       document.getElementById("buttons-admin").classList.add("hidden");
+        
+      }
+    }
+  })
+  }).then(()=>{
+  setInterval(() => {
     let messagesObj = JSON.parse(localStorage.getItem(`${groupName}`));
     let lastMessageId;
     if (messagesObj) {
@@ -101,7 +127,7 @@ function openChat(e) {
 
         if (Array.isArray(messagesObj)) {
           messagesObj.forEach((element) => {
-            if (element.messageText == "JOINED") {
+            if (element.messageText == "CREATED") {
               joinedNotificationinUI(element.name);
             } else showMessageinUI(element.messageText, element.name);
           });
@@ -110,13 +136,16 @@ function openChat(e) {
       .catch((err) => {
         console.log(err);
       });
-  },1000)
-  
+  }, 1000);
+
+}).catch(err=>console.log(err));
+ 
 }
 
 document.getElementsByClassName("btn")[0].addEventListener("click", () => {
   let token = localStorage.getItem("token");
   let chatMessage = document.getElementById("chatMessageInput").value;
+  console.log(groupName)
   let reqObj = {
     chatMessage,
     groupName
@@ -178,7 +207,8 @@ document.getElementsByClassName("btn")[0].addEventListener("click", () => {
 // },2000);
 
 
-document.getElementById("addUserSubmitButton").addEventListener('click',()=>{
+document.getElementById("addUserSubmitButton").addEventListener('click',(e)=>{
+  e.preventDefault();
    const inputEmail = document.getElementById("inputEmail").value;
    const reqObj = {
      inputEmail,
@@ -189,10 +219,62 @@ document.getElementById("addUserSubmitButton").addEventListener('click',()=>{
      .post("http://localhost:3000/group/addUserGroup", reqObj)
      .then((result) => {
        console.log(result);
-       alert(result.data.message)
+       alert(`${inputEmail} added to ${groupName}`);
+       window.location.reload();
      })
      .then((err) => {
        console.log(err);
      });
 });
+
+function addAdminGroup(e){
+  document.getElementById("addAdminForm").classList.toggle("hidden");
+}
+
+function showUser(){
+  document.getElementById("user-list").classList.toggle('hidden');
+  document.getElementById("user-list").innerHTML='';
+  axios.get(`http://localhost:3000/group/groupUser?groupName=${groupName}`).then(result=>{
+    console.log(groupName)
+    console.log(result)
+    let users=result.data;
+    users.forEach(ele=>{
+      document.getElementById( "user-list").innerHTML += `<div class='user-row'>${ele.name}</div>`;
+    })
+  }).catch(err=>console.log(err));
+}
+
+document.getElementById("addAdminSubmitButton").addEventListener('click',(e)=>{
+  e.preventDefault();
+  let admin=document.getElementById("inputEmail-admin").value;
+  let reqObj={
+    admin,
+    groupName
+  }
+  console.log(reqObj)
+  axios.post("http://localhost:3000/group/addAdminGroup",reqObj).then(response=>{
+    alert(`${admin} is admin now`);
+    window.location.reload();
+  }).catch(err=>{
+    console.log(err)
+  });
+});
+
+function deleteUSer(event){
+  document.getElementById("addDeleteUserForm").classList.toggle('hidden');
+}
+document.getElementById("deleteUserSubmitButton").addEventListener('click',(e)=>{
+  e.preventDefault();
+  let email = document.getElementById("inputDeleteUser").value;
+  let reqObj={
+    email,
+    groupName
+  }
+  axios.post("http://localhost:3000/group/deleteUserGroup",reqObj).then(data=>{
+    console.log('removed')
+    alert(`${email} removed from ${groupName}`)
+    window.location.reload();
+  }).catch(err=>console.log(err));
+});
+
 

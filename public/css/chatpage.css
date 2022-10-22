@@ -40,12 +40,17 @@ p:nth-child(even){
     text-align: center;
 }
 #addGroup{
-    background-color: greenyellow;
+    background-color: lightgreen;
     padding: 5px;
     border-radius: 5px;
     color: black;
 }
 #addGroupForm{
+    background-color: skyblue;
+    text-align: center;
+    margin-top: 30px;
+}
+.add-formStyle{
     background-color: skyblue;
     text-align: center;
     margin-top: 30px;
@@ -58,5 +63,16 @@ p:nth-child(even){
     display: flex;
     justify-content: space-around;
     padding: 5px;
+    margin-bottom: 10px;
+}
+#buttons-admin{
+    margin: 20px 0 20px 0;
+}
+#buttons-user {
+    margin: 20px 0 20px 0;
+}
+.user-row{
+    background-color: lightgreen;
+    margin-top: 10px;
     margin-bottom: 10px;
 }

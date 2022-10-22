@@ -4,19 +4,29 @@ const User_group=require('../model/user_group');
 const Message=require('../model/message')
 
 exports.addGroup=(req,res,next)=>{
+    let group;
     let groupName=req.body.groupName
     req.user.createGroup({
         name:groupName,
         createdBy:req.user.name
     }).then(result=>{
+        group=result;
         console.log(result.id)
         return Message.create({
-            messageText:"JOINED",
+            messageText:"CREATED",
             name:req.user.name,
             GroupId:result.id
         })
-        
-    }).then(result1=>{
+    }).then(()=>{
+        return User_group.update(
+           { isAdmin:true},
+            {where:{
+                GroupId:group.id,
+                UserId:req.user.id
+            }}
+        )
+    })
+    .then(result1=>{
         res.status(200).json(result1);
     }).catch(err=>{
         res.status(400).json({ message: "something went wrong" });
@@ -70,4 +80,97 @@ exports.addUserGroup=(req,res,next)=>{
         else
           res.status(404).json({message:"User not present"})
     })
+}
+
+exports.adminChecks=(req,res,next)=>{
+  
+    req.user.getGroups()
+    .then(result=>{
+        res.status(200).json(result)
+    }).catch(err=>{
+        console.log(err)
+    })
+}
+
+exports.addAdminGroup=(req,res,next)=>{
+    console.log('96')
+    let userRes,groupRes;
+    User.findOne({
+        where:{
+            email:req.body.admin
+        }
+    }).then(user=>{
+        userRes=user;
+        return Group.findOne({
+            where:{
+                name:req.body.groupName
+            }
+        })
+    }).then(group=>{
+        groupRes=group
+        return User_group.update({
+            isAdmin:true
+        },
+       { where:{
+           UserId:userRes.id,
+           GroupId:groupRes.id
+       }})
+    }).then(result=>{
+        console.log(result)
+        res.status(200).json({message:`${userRes.name} is Admin now`})
+    }).catch(err=>{
+        res.status(400).json({message:'something went wrong'})
+    })
+}
+
+exports.groupUser=(req,res,next)=>{
+    
+    let groupName=req.query.groupName;
+    console.log("groupName", groupName);
+    Group.findOne({
+        where:{
+            name:groupName
+        }
+    }).then(group=>{
+        console.log(group)
+        return group.getUsers()
+    }).then(data=>{
+        res.status(200).json(data)
+    }).catch(err=>{
+        console.log(err)
+    })
+}
+
+exports.deleteUserGroup=(req,res,next)=>{
+    console.log('delteUser')
+    let user,group;
+    User.findOne({
+        where:{
+            email:req.body.email
+        }
+    }).then(data=>{
+        user=data;
+        return Group.findOne({
+            where:{
+                name:req.body.groupName
+            }
+        })
+    }).then(result=>{
+        group=result;
+        console.log(user.id);
+        console.log(group.id)
+        return User_group.destroy({
+          where: {
+            GroupId:group.id,
+            UserId:user.id
+          }
+        })
+    }).then(response=>{
+        res.status(200).json({message:"User deleted successfully"})
+    }).catch(err=>{
+        console.log(err)
+        res.status(400).json({message:"something went wrong"})
+    })
+
+    
 }

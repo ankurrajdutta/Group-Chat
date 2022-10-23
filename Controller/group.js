@@ -3,6 +3,7 @@ const User=require('../model/user');
 const User_group=require('../model/user_group');
 const Message=require('../model/message')
 
+
 exports.addGroup=(req,res,next)=>{
     let group;
     let groupName=req.body.groupName
@@ -142,7 +143,7 @@ exports.groupUser=(req,res,next)=>{
 }
 
 exports.deleteUserGroup=(req,res,next)=>{
-    console.log('delteUser')
+  
     let user,group;
     User.findOne({
         where:{
